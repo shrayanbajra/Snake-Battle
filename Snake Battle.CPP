@@ -5,83 +5,42 @@
 #include <stdio.h>
 
 int maxx, maxy;
+int m[500], n[500], m1[500], n1[500], con = 3, con1 = 3;
+int x = 13, y = 14;
+int s, k, f, u;
+int ch, x1 = 13, y1 = 314, p, q, spd = 100;
 
 void win(int m[500], int n[500], int con, int number);
-void mainMenu();
+void showMainMenu();
 void border(int maxx, int maxy);
 void end(int m[500], int n[500], int m1[500], int n1[500], int con, int con1, int num);
+
+void checkIfEscapeIsPressed();
+void randomizeFruitPosition();
+void displayFruit();
+void checkUserInput();
+void identifyUserInput();
+
+void displayPlayer1();
+void displayHeadOfPlayer1();
+void displayTailOfPlayer1();
 
 void main(void)
 {
 
-	//Initialization
-	int m[500], n[500], m1[500], n1[500], con = 3, con1 = 3;
-	int x = 13, y = 14;
-	int s, k, f, u;
-	int ch, x1 = 13, y1 = 314, p, q, spd = 100;
-
 	int gd = DETECT, gm;
 	initgraph(&gd, &gm, "c:\\turboc3\\bgi");
 
-	mainMenu();
-
-	//Check for ESC
-	ch = getch();
-	if (ch == 27)
-		exit(0);
-	cleardevice();
-	maxx = getmaxx() - 20;
-	maxy = getmaxy() - 20;
-
+	showMainMenu();
+	checkIfEscapeIsPressed();
 	randomize(); //This function initializes the start and stop
-
-	//Randomizes the position of the fruit
-	p = random(maxx - 39);
-	int temp = p % 13;
-	p = p - temp + 13;
-	q = random(maxy - 42);
-	temp = q % 14;
-	q = q - temp + 14;
-
-	int a = 0, i = 0, j;
-	int a1 = 0;
+	randomizeFruitPosition();
 
 	while (1)
 	{
-		//Fruit
-		setcolor(WHITE);
-		setfillstyle(SOLID_FILL, con % 4 + con1 % 4);
-		circle(p, q, 5);
-		floodfill(p, q, WHITE);
-
+		displayFruit();
 		border(maxx, maxy);
-
-		if (kbhit())
-		{ //Check for input
-			ch = getch();
-			if (ch == 72 && a != 2)
-				a = 1;
-			if (ch == 80 && a != 1)
-				a = 2;
-			if (ch == 75 && a != 4)
-				a = 3;
-			if (ch == 77 && a != 3)
-				a = 4;
-
-			if (ch == 'w' && a1 != 2)
-				a1 = 1;
-			if (ch == 's' && a1 != 1)
-				a1 = 2;
-			if (ch == 'a' && a1 != 4)
-				a1 = 3;
-			if (ch == 'd' && a1 != 3)
-				a1 = 4;
-		}
-		else
-		{
-			if (ch == 27)
-				break;
-		}
+		checkUserInput();
 
 		//Logic part
 		if (i < 20)
@@ -110,35 +69,9 @@ void main(void)
 			m1[0] = x1;
 			n1[0] = y1;
 
-			// Head
-			setcolor(WHITE);
-			setfillstyle(SOLID_FILL, con + 6);
-			circle(m[0], n[0], 8);
-			floodfill(m[0], n[0], WHITE);
+			displayPlayer1();
+			displayPlayer2();
 
-			// Tail
-			setcolor(WHITE);
-			for (j = 1; j < con; j++)
-			{
-				setfillstyle(SOLID_FILL, con + 23);
-				circle(m[j], n[j], 5);
-				floodfill(m[j], n[j], WHITE);
-			}
-
-			// Head2
-			setcolor(WHITE);
-			setfillstyle(SOLID_FILL, con1 + 15);
-			circle(m1[0], n1[0], 8);
-			floodfill(m1[0], n1[0], WHITE);
-
-			// Tail2
-			setcolor(WHITE);
-			for (k = 1; k < con1; k++)
-			{
-				setfillstyle(SOLID_FILL, con1 + k % 3);
-				circle(m1[k], n1[k], 5);
-				floodfill(m1[k], n1[k], WHITE);
-			}
 			delay(spd);
 
 			//Trailing part of the snake
@@ -276,6 +209,131 @@ void main(void)
 	}
 }
 
+void checkIfEscapeIsPressed()
+{
+	ch = getch();
+	if (ch == 27) // ESC button
+		exit(0);
+	cleardevice();
+	maxx = getmaxx() - 20;
+	maxy = getmaxy() - 20;
+}
+
+void randomizeFruitPosition()
+{
+	p = random(maxx - 39);
+	int temp = p % 13;
+	p = p - temp + 13;
+	q = random(maxy - 42);
+	temp = q % 14;
+	q = q - temp + 14;
+
+	int a = 0, i = 0, j;
+	int a1 = 0;
+}
+
+void displayFruit()
+{
+	setcolor(WHITE);
+	setfillstyle(SOLID_FILL, con % 4 + con1 % 4);
+	circle(p, q, 5);
+	floodfill(p, q, WHITE);
+}
+
+void checkUserInput()
+{
+	if (kbhit())
+	{ //Check for input
+		identifyUserInput();
+	}
+	else
+	{
+		if (ch == 27)
+			break;
+	}
+}
+
+void identifyUserInput()
+{
+	ch = getch();
+	identifyInputForPlayer1();
+	identifyInputForPlayer2();
+}
+
+void identifyInputForPlayer1()
+{
+	if (ch == 72 && a != 2)
+		a = 1;
+	if (ch == 80 && a != 1)
+		a = 2;
+	if (ch == 75 && a != 4)
+		a = 3;
+	if (ch == 77 && a != 3)
+		a = 4;
+}
+
+void identifyInputForPlayer2()
+{
+	if (ch == 'w' && a1 != 2)
+		a1 = 1;
+	if (ch == 's' && a1 != 1)
+		a1 = 2;
+	if (ch == 'a' && a1 != 4)
+		a1 = 3;
+	if (ch == 'd' && a1 != 3)
+		a1 = 4;
+}
+
+void displayPlayer1()
+{
+	displayHeadOfPlayer1();
+	displayTailOfPlayer1();
+}
+
+void displayHeadOfPlayer1()
+{
+	setcolor(WHITE);
+	setfillstyle(SOLID_FILL, con + 6);
+	circle(m[0], n[0], 8);
+	floodfill(m[0], n[0], WHITE);
+}
+
+void displayTailOfPlayer1()
+{
+	setcolor(WHITE);
+	for (j = 1; j < con; j++)
+	{
+		setfillstyle(SOLID_FILL, con + 23);
+		circle(m[j], n[j], 5);
+		floodfill(m[j], n[j], WHITE);
+	}
+}
+
+void displayPlayer2()
+{
+	displayHeadOfPlayer2();
+	displayTailOfPlayer2();
+}
+
+void displayHeadOfPlayer2()
+{
+	setcolor(WHITE);
+	setfillstyle(SOLID_FILL, con1 + 15);
+	circle(m1[0], n1[0], 8);
+	floodfill(m1[0], n1[0], WHITE);
+}
+
+void displayTailOfPlayer2()
+{
+	setcolor(WHITE);
+	for (k = 1; k < con1; k++)
+	{
+		setfillstyle(SOLID_FILL, con1 + k % 3);
+		circle(m1[k], n1[k], 5);
+		floodfill(m1[k], n1[k], WHITE);
+	}
+}
+
 void win(int m[500], int n[500], int con, int number)
 {
 	int c, v;
@@ -304,7 +362,7 @@ void win(int m[500], int n[500], int con, int number)
 	exit(0);
 }
 
-void mainMenu()
+void showMainMenu()
 {
 	setcolor(GREEN);
 	settextstyle(3, 0, 6);
